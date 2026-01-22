@@ -1,0 +1,8 @@
+{
+  "name": "KANT - Modern Fashion E-commerce",
+  "description": "A high-end pastel-themed fashion platform with integrated AI assistant, comprehensive order management, and modern UI/UX design.",
+  "requestFramePermissions": [
+    "camera",
+    "microphone"
+  ]
+}
