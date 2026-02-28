@@ -83,23 +83,30 @@ const Login: React.FC<LoginProps> = ({ onNavigate, onLogin }) => {
             </div>
           </div>
 
-          <div className="space-y-2">
-            <div className="flex justify-between items-center px-1">
-              <label className="text-[10px] font-black uppercase tracking-widest text-gray-400">Mật khẩu</label>
-              <button type="button" className="text-[10px] font-bold text-[#F48FB1] hover:underline uppercase">Quên mật khẩu?</button>
-            </div>
-            <div className="relative">
-              <Lock className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-[#90CAF9]" />
-              <input 
-                type="password" 
-                required
-                placeholder="••••••••"
-                className="w-full pl-12 pr-4 py-3 bg-white/80 rounded-2xl border border-white/20 focus:outline-none focus:ring-2 focus:ring-[#90CAF9]/50 font-montserrat text-sm"
-                value={password}
-                onChange={(e) => setPassword(e.target.value)}
-              />
-            </div>
-          </div>
+         <div className="space-y-2">
+  <label className="text-[10px] font-black uppercase tracking-widest text-gray-400 ml-1">
+    Mật khẩu
+  </label>
+
+  <div className="relative">
+    <Lock className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-[#90CAF9]" />
+    <input
+      type="password"
+      required
+      placeholder="••••••••"
+      className="w-full pl-12 pr-4 py-3 bg-white/80 rounded-2xl border border-white/20 focus:outline-none focus:ring-2 focus:ring-[#90CAF9]/50 font-montserrat text-sm"
+      value={password}
+      onChange={(e) => setPassword(e.target.value)}
+    />
+  </div>
+
+  <button
+    type="button"
+    className="block w-full text-right text-[10px] font-bold text-[#F48FB1] hover:underline uppercase pr-1"
+  >
+    Quên mật khẩu?
+  </button>
+</div>
 
           {error && <p className="text-center text-xs font-bold text-red-400 animate-shake">{error}</p>}
 
