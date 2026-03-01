@@ -1,0 +1,6 @@
+@LTUDW_HostAddress = http://localhost:5269
+
+GET {{LTUDW_HostAddress}}/weatherforecast/
+Accept: application/json
+
+###
