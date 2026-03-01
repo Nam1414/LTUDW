@@ -7,10 +7,10 @@ using FashionEcommerce.Api.Models;
 
 var builder = WebApplication.CreateBuilder(args);
 
-// Add services
+// Controllers + Swagger
 builder.Services.AddControllers();
 builder.Services.AddEndpointsApiExplorer();
-builder.Services.AddSwaggerGen();  // Swagger
+builder.Services.AddSwaggerGen();  // Simple Swagger
 
 // Database
 builder.Services.AddDbContext<AppDbContext>(options =>
@@ -29,13 +29,13 @@ builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
             ValidIssuer = builder.Configuration["Jwt:Issuer"],
             ValidAudience = builder.Configuration["Jwt:Audience"],
             IssuerSigningKey = new SymmetricSecurityKey(
-                Encoding.UTF8.GetBytes(builder.Configuration["Jwt:Key"]!))
+                Encoding.UTF8.GetBytes(builder.Configuration["Jwt:Key"] ?? string.Empty))
         };
     });
 
 var app = builder.Build();
 
-// Configure pipeline
+
 if (app.Environment.IsDevelopment())
 {
     app.UseSwagger();

@@ -137,3 +137,6 @@ D:\BaiTapTongHop\UNG DUNG WEB MR.HUNG\LTUDW\backend\FashionEcommerce.Api\obj\Deb
 D:\BaiTapTongHop\UNG DUNG WEB MR.HUNG\LTUDW\backend\FashionEcommerce.Api\obj\Debug\net9.0\FashionEcommerce.Api.pdb
 D:\BaiTapTongHop\UNG DUNG WEB MR.HUNG\LTUDW\backend\FashionEcommerce.Api\obj\Debug\net9.0\FashionEcommerce.Api.genruntimeconfig.cache
 D:\BaiTapTongHop\UNG DUNG WEB MR.HUNG\LTUDW\backend\FashionEcommerce.Api\obj\Debug\net9.0\ref\FashionEcommerce.Api.dll
+D:\BaiTapTongHop\UNG DUNG WEB MR.HUNG\LTUDW\backend\FashionEcommerce.Api\bin\Debug\net9.0\Swashbuckle.AspNetCore.Swagger.dll
+D:\BaiTapTongHop\UNG DUNG WEB MR.HUNG\LTUDW\backend\FashionEcommerce.Api\bin\Debug\net9.0\Swashbuckle.AspNetCore.SwaggerGen.dll
+D:\BaiTapTongHop\UNG DUNG WEB MR.HUNG\LTUDW\backend\FashionEcommerce.Api\bin\Debug\net9.0\Swashbuckle.AspNetCore.SwaggerUI.dll
