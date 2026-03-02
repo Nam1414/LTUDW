@@ -1,3 +1,5 @@
+namespace LTUDW.Models;
+
 public class Order
 {
     public int Id { get; set; }
@@ -15,4 +17,8 @@ public class Order
     public string PaymentMethod { get; set; } = null!;
     public string? PaymentStatus { get; set; }
     public int? Status { get; set; }
+
+    public User? User { get; set; }
+    public ICollection<OrderDetail>? OrderDetails { get; set; }
+    public ICollection<OrderStatusHistory>? OrderStatusHistories { get; set; }
 }

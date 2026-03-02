@@ -1,3 +1,5 @@
+namespace LTUDW.Models;
+
 public class Category
 {
     public int Id { get; set; }
@@ -5,4 +7,8 @@ public class Category
     public string Slug { get; set; } = null!;
     public int? ParentId { get; set; }
     public bool? IsActive { get; set; }
+
+    public Category? Parent { get; set; }
+    public ICollection<Category>? Children { get; set; }
+    public ICollection<Product>? Products { get; set; }
 }

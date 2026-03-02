@@ -1,3 +1,5 @@
+namespace LTUDW.Models;
+
 public class PromotionCondition
 {
     public int Id { get; set; }
@@ -5,4 +7,6 @@ public class PromotionCondition
     public string Field { get; set; } = null!;
     public string Operator { get; set; } = null!;
     public string Value { get; set; } = null!;
+
+    public Promotion? Promotion { get; set; }
 }

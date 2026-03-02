@@ -1,3 +1,5 @@
+namespace LTUDW.Models;
+
 public class Coupon
 {
     public int Id { get; set; }
@@ -7,4 +9,7 @@ public class Coupon
     public bool? IsUsed { get; set; }
     public DateTime ExpiryDate { get; set; }
     public DateTime? CreatedAt { get; set; }
+
+    public User? User { get; set; }
+    public Promotion? Promotion { get; set; }
 }

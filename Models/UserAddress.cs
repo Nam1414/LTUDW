@@ -1,3 +1,5 @@
+namespace LTUDW.Models;
+
 public class UserAddress
 {
     public int Id { get; set; }
@@ -9,4 +11,6 @@ public class UserAddress
     public string District { get; set; } = null!;
     public string Ward { get; set; } = null!;
     public bool? IsDefault { get; set; }
+
+    public User? User { get; set; }
 }

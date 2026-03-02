@@ -1,3 +1,5 @@
+namespace LTUDW.Models;
+
 public class CartItem
 {
     public int Id { get; set; }
@@ -5,4 +7,8 @@ public class CartItem
     public int ProductId { get; set; }
     public int ProductVariantId { get; set; }
     public int? Quantity { get; set; }
+
+    public User? User { get; set; }
+    public Product? Product { get; set; }
+    public ProductVariant? ProductVariant { get; set; }
 }

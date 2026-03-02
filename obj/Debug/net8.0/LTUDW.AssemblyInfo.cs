@@ -13,7 +13,7 @@ using System.Reflection;
 [assembly: System.Reflection.AssemblyCompanyAttribute("LTUDW")]
 [assembly: System.Reflection.AssemblyConfigurationAttribute("Debug")]
 [assembly: System.Reflection.AssemblyFileVersionAttribute("1.0.0.0")]
-[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+d04fa8b577023ce6132ca8598edf15ccf4efb41f")]
+[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+ab1abc6ac00fc0754309b2946d36b61454df6287")]
 [assembly: System.Reflection.AssemblyProductAttribute("LTUDW")]
 [assembly: System.Reflection.AssemblyTitleAttribute("LTUDW")]
 [assembly: System.Reflection.AssemblyVersionAttribute("1.0.0.0")]

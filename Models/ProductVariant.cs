@@ -1,3 +1,5 @@
+namespace LTUDW.Models;
+
 public class ProductVariant
 {
     public int Id { get; set; }
@@ -7,4 +9,8 @@ public class ProductVariant
     public string Sku { get; set; } = null!;
     public int? Quantity { get; set; }
     public decimal? PriceModifier { get; set; }
+
+    public Product? Product { get; set; }
+    public MasterColor? Color { get; set; }
+    public MasterSize? Size { get; set; }
 }

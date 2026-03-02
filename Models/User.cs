@@ -1,5 +1,4 @@
 namespace LTUDW.Models;
-
 public class User
 {
     public int Id { get; set; }
@@ -14,4 +13,11 @@ public class User
     public string? Role { get; set; }
     public bool? IsLocked { get; set; }
     public DateTime? CreatedAt { get; set; }
+
+    public ICollection<UserAddress>? UserAddresses { get; set; }
+    public ICollection<CartItem>? CartItems { get; set; }
+    public ICollection<Order>? Orders { get; set; }
+    public ICollection<Notification>? Notifications { get; set; }
+    public ICollection<ProductReview>? Reviews { get; set; }
+    public ICollection<Coupon>? Coupons { get; set; }
 }

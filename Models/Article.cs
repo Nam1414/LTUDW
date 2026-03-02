@@ -1,3 +1,5 @@
+namespace LTUDW.Models;
+
 public class Article
 {
     public int Id { get; set; }
@@ -9,4 +11,6 @@ public class Article
     public int CategoryId { get; set; }
     public bool? IsPublished { get; set; }
     public DateTime? PublishedAt { get; set; }
+
+    public ArticleCategory? Category { get; set; }
 }
