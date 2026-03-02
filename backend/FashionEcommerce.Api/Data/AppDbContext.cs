@@ -7,7 +7,7 @@ namespace FashionEcommerce.Api.Data;
 public class AppDbContext : DbContext
 {
     public DbSet<User> Users { get; set; } = null!;
-    
+    public DbSet<RefreshToken> RefreshTokens { get; set; } = null!;
     public AppDbContext(DbContextOptions<AppDbContext> options) : base(options) { }
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)  // ← Fix param + override
@@ -30,5 +30,11 @@ public class AppDbContext : DbContext
             IsLocked = false,
             CreatedAt = DateTime.UtcNow
         });
+
+        modelBuilder.Entity<RefreshToken>()
+            .HasOne(rt => rt.User)
+            .WithMany(u => u.RefreshTokens)
+            .HasForeignKey(rt => rt.UserId)
+            .OnDelete(DeleteBehavior.Cascade);
     }
 }

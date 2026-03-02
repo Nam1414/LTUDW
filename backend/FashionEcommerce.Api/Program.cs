@@ -7,6 +7,7 @@ using FashionEcommerce.Api.Data;
 using FashionEcommerce.Api.Models;
 using FashionEcommerce.Api.Services;
 using Microsoft.OpenApi.Models;
+using FashionEcommerce.Api.Middleware;
 
 
 var builder = WebApplication.CreateBuilder(args);
@@ -99,6 +100,7 @@ if (app.Environment.IsDevelopment())
 {
     app.UseSwagger();
     app.UseSwaggerUI();
+    app.UseMiddleware<GlobalExceptionMiddleware>(); // Dev-only for detailed error info
 }
 
 app.UseHttpsRedirection();

@@ -12,4 +12,5 @@ public class User
     public string Role { get; set; } = "Customer"; // Admin/Customer
     public bool IsLocked { get; set; } 
     public DateTime CreatedAt { get; set; } = DateTime.UtcNow;
+    public List<RefreshToken> RefreshTokens { get; set; } = new List<RefreshToken>();
 }

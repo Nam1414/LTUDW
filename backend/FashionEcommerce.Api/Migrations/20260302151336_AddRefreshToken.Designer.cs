@@ -4,6 +4,7 @@ using FashionEcommerce.Api.Data;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -11,9 +12,11 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace FashionEcommerce.Api.Migrations
 {
     [DbContext(typeof(AppDbContext))]
-    partial class AppDbContextModelSnapshot : ModelSnapshot
+    [Migration("20260302151336_AddRefreshToken")]
+    partial class AddRefreshToken
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -50,7 +53,7 @@ namespace FashionEcommerce.Api.Migrations
 
                     b.HasIndex("UserId");
 
-                    b.ToTable("RefreshTokens");
+                    b.ToTable("RefreshToken");
                 });
 
             modelBuilder.Entity("FashionEcommerce.Api.Models.User", b =>
@@ -94,11 +97,11 @@ namespace FashionEcommerce.Api.Migrations
                         new
                         {
                             Id = 1,
-                            CreatedAt = new DateTime(2026, 3, 2, 15, 58, 42, 184, DateTimeKind.Utc).AddTicks(9081),
+                            CreatedAt = new DateTime(2026, 3, 2, 15, 13, 35, 131, DateTimeKind.Utc).AddTicks(4026),
                             Email = "admin@fashion.com",
                             FullName = "Admin User",
                             IsLocked = false,
-                            PasswordHash = "$2a$11$rLL0FiHnbMNAZrbtX6rMPO2vUPNh4Y9wsXm7plK3OXiPQvZvJiZTG",
+                            PasswordHash = "$2a$11$qvKMvUsa/HT79JBfYxv4.utNacxfjQu5u3bqStLqkTolnoPw.pV2u",
                             Role = "Admin"
                         });
                 });
@@ -106,17 +109,12 @@ namespace FashionEcommerce.Api.Migrations
             modelBuilder.Entity("FashionEcommerce.Api.Models.RefreshToken", b =>
                 {
                     b.HasOne("FashionEcommerce.Api.Models.User", "User")
-                        .WithMany("RefreshTokens")
+                        .WithMany()
                         .HasForeignKey("UserId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
                     b.Navigation("User");
-                });
-
-            modelBuilder.Entity("FashionEcommerce.Api.Models.User", b =>
-                {
-                    b.Navigation("RefreshTokens");
                 });
 #pragma warning restore 612, 618
         }
