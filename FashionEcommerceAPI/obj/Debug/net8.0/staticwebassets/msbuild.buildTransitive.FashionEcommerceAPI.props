@@ -1,0 +1,3 @@
+﻿<Project>
+  <Import Project="..\buildMultiTargeting\FashionEcommerceAPI.props" />
+</Project>
