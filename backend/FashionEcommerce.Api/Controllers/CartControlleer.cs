@@ -71,8 +71,9 @@ public class CartController : ControllerBase
         if (item == null) return NotFound();
 
         var product = await _context.Products.FindAsync(item.ProductId);
-        if (product.Stock < quantity) return BadRequest("Insufficient stock");
-
+        // if (product.Stock < quantity) return BadRequest("Insufficient stock");
+        if (product == null || product.Stock < quantity) return BadRequest("Insufficient stock");
+        
         item.Quantity = quantity;
         await _context.SaveChangesAsync();
 
