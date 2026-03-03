@@ -4,6 +4,7 @@ using FashionEcommerce.Api.Data;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -11,9 +12,11 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace FashionEcommerce.Api.Migrations
 {
     [DbContext(typeof(AppDbContext))]
-    partial class AppDbContextModelSnapshot : ModelSnapshot
+    [Migration("20260303133227_AddProductsCartImages")]
+    partial class AddProductsCartImages
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -90,7 +93,7 @@ namespace FashionEcommerce.Api.Migrations
                         new
                         {
                             Id = 1,
-                            CreatedAt = new DateTime(2026, 3, 3, 13, 41, 51, 232, DateTimeKind.Utc).AddTicks(2191),
+                            CreatedAt = new DateTime(2026, 3, 3, 13, 32, 26, 395, DateTimeKind.Utc).AddTicks(6186),
                             Description = "Cotton T-Shirt",
                             Discount = 0m,
                             Name = "T-Shirt",
@@ -100,7 +103,7 @@ namespace FashionEcommerce.Api.Migrations
                         new
                         {
                             Id = 2,
-                            CreatedAt = new DateTime(2026, 3, 3, 13, 41, 51, 232, DateTimeKind.Utc).AddTicks(2193),
+                            CreatedAt = new DateTime(2026, 3, 3, 13, 32, 26, 395, DateTimeKind.Utc).AddTicks(6189),
                             Description = "Blue Jeans",
                             Discount = 10m,
                             Name = "Jeans",
@@ -181,11 +184,11 @@ namespace FashionEcommerce.Api.Migrations
                         new
                         {
                             Id = 1,
-                            CreatedAt = new DateTime(2026, 3, 3, 13, 41, 51, 231, DateTimeKind.Utc).AddTicks(7274),
+                            CreatedAt = new DateTime(2026, 3, 3, 13, 32, 26, 395, DateTimeKind.Utc).AddTicks(1591),
                             Email = "admin@fashion.com",
                             FullName = "Admin User",
                             IsLocked = false,
-                            PasswordHash = "$2a$11$16Ux8qli0daj2iqpVnFfH.78RsrbzbJ2zqGtYeCPWNsOGzZT821da",
+                            PasswordHash = "$2a$11$RTbH56CoHHhEL4JynaovcO7rMjrNYQVMJ8MOET5REn.1y/aZIeriS",
                             Role = "Admin"
                         });
                 });
