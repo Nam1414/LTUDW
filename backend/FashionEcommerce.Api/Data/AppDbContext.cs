@@ -12,6 +12,10 @@ public class AppDbContext : DbContext
     public DbSet<Product> Products { get; set; } = null!;
     public DbSet<ProductImage> ProductImages { get; set; } = null!;
     public DbSet<CartItem> CartItems { get; set; } = null!;
+    public DbSet<Order> Orders { get; set; } = null!;
+    public DbSet<OrderDetail> OrderDetails { get; set; } = null!;
+    public DbSet<OrderStatusHistory> OrderStatusHistories { get; set; } = null!;
+
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)  // ← Fix param + override
     {
@@ -66,6 +70,47 @@ public class AppDbContext : DbContext
             new Product { Id = 1, Name = "T-Shirt", Description = "Cotton T-Shirt", Price = 20m, Discount = 0m, Stock = 100, CreatedAt = DateTime.UtcNow },
             new Product { Id = 2, Name = "Jeans", Description = "Blue Jeans", Price = 50m, Discount = 10m, Stock = 50, CreatedAt = DateTime.UtcNow }
         );
+
+        // Orders
+        modelBuilder.Entity<Order>()
+            .HasOne(o => o.User)
+            .WithMany()
+            .HasForeignKey(o => o.UserId)
+            .OnDelete(DeleteBehavior.Restrict);
+
+        modelBuilder.Entity<Order>()
+            .Property(o => o.TotalAmount).HasColumnType("decimal(18,2)");
+        modelBuilder.Entity<Order>()
+            .Property(o => o.DiscountAmount).HasColumnType("decimal(18,2)");
+        modelBuilder.Entity<Order>()
+            .Property(o => o.ShippingFee).HasColumnType("decimal(18,2)");
+        modelBuilder.Entity<Order>()
+            .Property(o => o.FinalAmount).HasColumnType("decimal(18,2)");
+
+        // OrderDetails
+        modelBuilder.Entity<OrderDetail>()
+            .HasOne(od => od.Order)
+            .WithMany(o => o.OrderDetails)
+            .HasForeignKey(od => od.OrderId)
+            .OnDelete(DeleteBehavior.Cascade);
+
+        modelBuilder.Entity<OrderDetail>()
+            .HasOne(od => od.Product)
+            .WithMany()
+            .HasForeignKey(od => od.ProductId)
+            .OnDelete(DeleteBehavior.Restrict);
+
+        modelBuilder.Entity<OrderDetail>()
+            .Property(od => od.UnitPrice).HasColumnType("decimal(18,2)");
+        modelBuilder.Entity<OrderDetail>()
+            .Property(od => od.LineTotal).HasColumnType("decimal(18,2)");
+
+        // OrderStatusHistory
+        modelBuilder.Entity<OrderStatusHistory>()
+            .HasOne(h => h.Order)
+            .WithMany(o => o.StatusHistories)
+            .HasForeignKey(h => h.OrderId)
+            .OnDelete(DeleteBehavior.Cascade);
 
         //decimal precision (fix warnings)
         modelBuilder.Entity<Product>()
