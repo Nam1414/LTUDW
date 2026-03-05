@@ -60,6 +60,8 @@ builder.Services.AddScoped<IUserRepository, UserRepository>();
 
 // - Services
 builder.Services.AddScoped<IUserService, UserService>();
+builder.Services.AddScoped<ICategoryService, CategoryService>();
+builder.Services.AddScoped<IProductService, ProductService>();
 
 // 5. Cấu hình Controllers
 builder.Services.AddControllers();
