@@ -90,6 +90,18 @@ public class AdminOrdersController : ControllerBase
             ChangedAt = DateTime.UtcNow
         });
 
+        // Tạo notification cho customer
+        var notification = new Notification
+        {
+            UserId = order.UserId,
+            Title = $"Đơn hàng #{order.Id} đã thay đổi trạng thái",
+            Content = $"Đơn hàng #{order.Id} chuyển từ '{oldStatus}' sang '{dto.NewStatus}'. {dto.Note ?? ""}",
+            Type = "OrderStatusChanged",
+            ReferenceId = order.Id,
+            CreatedAt = DateTime.UtcNow
+        };
+        _context.Notifications.Add(notification);
+
         await _context.SaveChangesAsync();
 
         return Ok(new

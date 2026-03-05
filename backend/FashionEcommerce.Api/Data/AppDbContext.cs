@@ -15,6 +15,7 @@ public class AppDbContext : DbContext
     public DbSet<Order> Orders { get; set; } = null!;
     public DbSet<OrderDetail> OrderDetails { get; set; } = null!;
     public DbSet<OrderStatusHistory> OrderStatusHistories { get; set; } = null!;
+    public DbSet<Notification> Notifications { get; set; } = null!;
 
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)  // ← Fix param + override
@@ -121,5 +122,16 @@ public class AppDbContext : DbContext
 
         modelBuilder.Entity<CartItem>()
             .Property(ci => ci.UnitPriceSnapshot).HasColumnType("decimal(18,2)");
+
+        // Notification
+        modelBuilder.Entity<Notification>()
+            .HasOne(n => n.User)
+            .WithMany()  // User không cần back-ref
+            .HasForeignKey(n => n.UserId)  // int UserId → int User.Id
+            .OnDelete(DeleteBehavior.Cascade);
+
+        modelBuilder.Entity<Notification>()
+            .Property(n => n.Type)
+            .HasMaxLength(100);
     }
 }
