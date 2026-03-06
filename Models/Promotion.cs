@@ -2,9 +2,9 @@ public class Promotion
 {
     public int Id { get; set; }
 
-    public string Name { get; set; }
+    public string Name { get; set; } = string.Empty;
 
-    public string DiscountType { get; set; } // FIXED_AMOUNT / PERCENTAGE
+    public string DiscountType { get; set; } = string.Empty;
 
     public decimal DiscountValue { get; set; }
 

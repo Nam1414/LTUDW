@@ -32,6 +32,9 @@ public class CouponController : ControllerBase
             return BadRequest("Coupon expired");
 
         var promotion = coupon.Promotion;
+        
+        if (promotion == null)
+        return BadRequest("Promotion not found");
 
         if (!promotion.IsActive)
             return BadRequest("Promotion inactive");

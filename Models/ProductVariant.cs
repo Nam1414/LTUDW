@@ -10,7 +10,7 @@ public class ProductVariant
 
     public int SizeId { get; set; }
 
-    public string Sku { get; set; }
+    public string Sku { get; set; } = string.Empty;
 
     public int? Quantity { get; set; }
 

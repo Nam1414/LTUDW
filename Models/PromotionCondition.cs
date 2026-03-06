@@ -4,11 +4,11 @@ public class PromotionCondition
 
     public int PromotionId { get; set; }
 
-    public string Field { get; set; }
+    public string Field { get; set; } = string.Empty;
 
-    public string Operator { get; set; }
+    public string Operator { get; set; } = string.Empty;
 
-    public string Value { get; set; }
+    public string Value { get; set; } = string.Empty;
 
     public Promotion? Promotion { get; set; }
 }
