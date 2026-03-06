@@ -19,7 +19,7 @@ namespace FashionEcommerce.Models.Entities
         /// <summary>
         /// Tên đăng nhập
         /// </summary>
-        [MaxLength(100)]
+        [MaxLength(50)]
         public string? Username { get; set; }
 
         /// <summary>
@@ -34,13 +34,13 @@ namespace FashionEcommerce.Models.Entities
         /// </summary>
         [Required]
         [EmailAddress]
-        [MaxLength(255)]
+        [MaxLength(100)]
         public string Email { get; set; } = string.Empty;
 
         /// <summary>
         /// Google ID cho đăng nhập Google (nullable)
         /// </summary>
-        [MaxLength(255)]
+        [MaxLength(100)]
         public string? GoogleId { get; set; }
 
         /// <summary>
@@ -57,7 +57,7 @@ namespace FashionEcommerce.Models.Entities
         /// <summary>
         /// Số điện thoại
         /// </summary>
-        [MaxLength(20)]
+        [MaxLength(15)]
         public string? PhoneNumber { get; set; }
 
         /// <summary>
@@ -67,11 +67,11 @@ namespace FashionEcommerce.Models.Entities
         public string? AvatarUrl { get; set; }
 
         /// <summary>
-        /// Vai trò của người dùng (Admin/Customer)
+        /// Vai trò của người dùng (Admin/Customer) - Database sẽ tự động gán giá trị mặc định
         /// </summary>
         [Required]
-        [MaxLength(50)]
-        public string Role { get; set; } = "Customer";
+        [MaxLength(20)]
+        public string Role { get; set; } = "Customer"; // C# default as backup
 
         /// <summary>
         /// Trạng thái khóa tài khoản (true = bị khóa, false = hoạt động)
@@ -79,9 +79,8 @@ namespace FashionEcommerce.Models.Entities
         public bool IsLocked { get; set; } = false;
 
         /// <summary>
-        /// Ngày tạo tài khoản
+        /// Ngày tạo tài khoản - Database sẽ tự động gán giá trị mặc định
         /// </summary>
-        public DateTime CreatedAt { get; set; } = DateTime.UtcNow;
+        public DateTime CreatedAt { get; set; } // EF Core sẽ sử dụng default value từ database
     }
 }
-

@@ -19,26 +19,31 @@ namespace FashionEcommerce.Services
         }
 
         /// <summary>
-        /// Lấy danh sách products với filter và pagination
+        /// Lấy danh sách products với filter và pagination (Customer - chỉ lấy IsActive = true)
         /// </summary>
-        public async Task<PagedResult<ProductDto>> GetAllAsync(ProductQueryParameters queryParameters)
+        public async Task<PagedResult<ProductDto>> GetAllAsync(
+            ProductQueryParameters queryParameters, 
+            CancellationToken cancellationToken = default)
         {
             // Bắt đầu với IQueryable để tận dụng lazy loading
             var query = _context.Products
                 .AsNoTracking()
                 .Include(p => p.Category)
+                .Where(p => p.IsActive)
                 .AsQueryable();
 
             // Apply filters
             query = ApplyFilters(query, queryParameters);
 
-            // Get total count before pagination
-            var totalItems = await query.CountAsync();
+            // EF Core 9: Sử dụng CountAsync với CancellationToken
+            var totalItems = await query.CountAsync(cancellationToken);
 
             // Calculate total pages
-            var totalPages = (int)Math.Ceiling(totalItems / (double)queryParameters.PageSize);
+            var totalPages = queryParameters.PageSize > 0
+                ? (int)Math.Ceiling(totalItems / (double)queryParameters.PageSize)
+                : 0;
 
-            // Apply pagination
+            // Apply pagination với CancellationToken
             var items = await query
                 .Skip((queryParameters.PageIndex - 1) * queryParameters.PageSize)
                 .Take(queryParameters.PageSize)
@@ -54,7 +59,57 @@ namespace FashionEcommerce.Services
                     Thumbnail = p.Thumbnail,
                     IsActive = p.IsActive
                 })
-                .ToListAsync();
+                .ToListAsync(cancellationToken);
+
+            return new PagedResult<ProductDto>
+            {
+                TotalItems = totalItems,
+                TotalPages = totalPages,
+                PageIndex = queryParameters.PageIndex,
+                PageSize = queryParameters.PageSize,
+                Items = items
+            };
+        }
+
+        /// <summary>
+        /// Lấy danh sách products bao gồm cả inactive (Admin)
+        /// </summary>
+        public async Task<PagedResult<ProductDto>> GetAllForAdminAsync(
+            ProductQueryParameters queryParameters,
+            CancellationToken cancellationToken = default)
+        {
+            // Bắt đầu với IQueryable - lấy tất cả không filter IsActive
+            var query = _context.Products
+                .AsNoTracking()
+                .Include(p => p.Category)
+                .AsQueryable();
+
+            // Apply filters
+            query = ApplyFilters(query, queryParameters);
+
+            // EF Core 9: Sử dụng CountAsync với CancellationToken
+            var totalItems = await query.CountAsync(cancellationToken);
+
+            var totalPages = queryParameters.PageSize > 0
+                ? (int)Math.Ceiling(totalItems / (double)queryParameters.PageSize)
+                : 0;
+
+            var items = await query
+                .Skip((queryParameters.PageIndex - 1) * queryParameters.PageSize)
+                .Take(queryParameters.PageSize)
+                .Select(p => new ProductDto
+                {
+                    Id = p.Id,
+                    Name = p.Name,
+                    Slug = p.Slug,
+                    Description = p.Description,
+                    Price = p.Price,
+                    CategoryId = p.CategoryId,
+                    CategoryName = p.Category != null ? p.Category.Name : null,
+                    Thumbnail = p.Thumbnail,
+                    IsActive = p.IsActive
+                })
+                .ToListAsync(cancellationToken);
 
             return new PagedResult<ProductDto>
             {
@@ -246,4 +301,3 @@ namespace FashionEcommerce.Services
         }
     }
 }
-

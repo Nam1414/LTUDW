@@ -24,9 +24,11 @@ namespace FashionEcommerce.Controllers
         /// Query parameters: SearchTerm, CategoryId, MinPrice, MaxPrice, PageIndex, PageSize
         /// </summary>
         [HttpGet]
-        public async Task<ActionResult<PagedResult<ProductDto>>> GetAll([FromQuery] ProductQueryParameters queryParameters)
+        public async Task<ActionResult<PagedResult<ProductDto>>> GetAll(
+            [FromQuery] ProductQueryParameters queryParameters,
+            CancellationToken cancellationToken = default)
         {
-            var result = await _productService.GetAllAsync(queryParameters);
+            var result = await _productService.GetAllAsync(queryParameters, cancellationToken);
             return Ok(result);
         }
 
@@ -107,4 +109,3 @@ namespace FashionEcommerce.Controllers
         }
     }
 }
-

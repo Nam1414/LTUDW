@@ -36,6 +36,7 @@ namespace FashionEcommerce.Services
             }
 
             // 2. Tạo User entity mới
+            // Lưu ý: Role và CreatedAt sẽ được database tự động gán giá trị mặc định
             var user = new User
             {
                 Email = registerDTO.Email.Trim().ToLower(),
@@ -43,10 +44,8 @@ namespace FashionEcommerce.Services
                 // Sử dụng BCrypt để hash mật khẩu
                 PasswordHash = BCrypt.Net.BCrypt.HashPassword(registerDTO.Password),
                 FullName = registerDTO.FullName?.Trim(),
-                PhoneNumber = registerDTO.PhoneNumber?.Trim(),
-                Role = "Customer", // Mặc định là Customer
-                IsLocked = false,
-                CreatedAt = DateTime.UtcNow
+                PhoneNumber = registerDTO.PhoneNumber?.Trim()
+                // Role và CreatedAt sẽ dùng giá trị mặc định từ database
             };
 
             // 3. Lưu vào database
@@ -218,4 +217,3 @@ namespace FashionEcommerce.Services
         }
     }
 }
-

@@ -42,7 +42,7 @@ builder.Services.AddDbContext<AppDbContext>(options =>
             ValidIssuer = jwtIssuer,
             ValidAudience = jwtAudience,
             IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(jwtSecretKey)),
-            ClockSkew = TimeSpan.Zero // Không cho phép lệch thời gian
+            ClockSkew = TimeSpan.Zero
         };
     });
 }
@@ -51,14 +51,8 @@ builder.Services.AddDbContext<AppDbContext>(options =>
 builder.Services.AddAuthorization();
 
 // 4. Đăng ký Dependency Injection
-
-// - Helpers
 builder.Services.AddSingleton<JwtHelper>();
-
-// - Repositories
 builder.Services.AddScoped<IUserRepository, UserRepository>();
-
-// - Services
 builder.Services.AddScoped<IUserService, UserService>();
 builder.Services.AddScoped<ICategoryService, CategoryService>();
 builder.Services.AddScoped<IProductService, ProductService>();
@@ -66,14 +60,17 @@ builder.Services.AddScoped<IProductService, ProductService>();
 // 5. Cấu hình Controllers
 builder.Services.AddControllers();
 
-// 6. Cấu hình Swagger với JWT Authorization
+// 6. Cấu hình OpenAPI cho .NET 9
+builder.Services.AddOpenApi();
+
+// Cấu hình Swagger với JWT Authorization
 builder.Services.AddSwaggerGen(c =>
 {
     c.SwaggerDoc("v1", new OpenApiInfo 
     { 
         Title = "Fashion Ecommerce API", 
         Version = "v1",
-        Description = "API for Fashion Ecommerce Users Management"
+        Description = "API for Fashion Ecommerce Users & Catalog Management"
     });
 
     // Cấu hình JWT Authorization trong Swagger
@@ -102,7 +99,7 @@ builder.Services.AddSwaggerGen(c =>
     });
 });
 
-// 7. Cấu hình CORS (Cross-Origin Resource Sharing)
+// 7. Cấu hình CORS
 builder.Services.AddCors(options =>
 {
     options.AddPolicy("AllowAll", policy =>
@@ -117,12 +114,15 @@ builder.Services.AddCors(options =>
 
 var app = builder.Build();
 
-// Configure the HTTP request pipeline
-// Bật Swagger ở mọi môi trường để test API
+// Bật OpenAPI endpoint (.NET 9)
+app.MapOpenApi();
+
+// Bật Swagger UI (với JWT support)
 app.UseSwagger();
 app.UseSwaggerUI(c =>
 {
-    c.SwaggerEndpoint("/swagger/v1/swagger.json", "Fashion Ecommerce API v1");
+    c.SwaggerEndpoint("/openapi/v1.json", "Fashion Ecommerce API v1");
+    c.DefaultModelsExpandDepth(-1); // Ẩn schemas mặc định
 });
 
 // 1. Sử dụng CORS
@@ -137,15 +137,11 @@ app.UseAuthorization();
 // 4. Map Controllers
 app.MapControllers();
 
-// 5. Tự động tạo database khi app khởi động (sử dụng EnsureCreated để tránh lỗi nếu bảng đã tồn tại)
+// 5. Tự động tạo database khi app khởi động
 using (var scope = app.Services.CreateScope())
 {
     var dbContext = scope.ServiceProvider.GetRequiredService<AppDbContext>();
-    // EnsureCreated() sẽ không gây lỗi nếu database/tables đã tồn tại
-    // Lưu ý: Nếu cần sử dụng migrations, hãy dùng dòng dưới đây:
-    // dbContext.Database.Migrate();
     
-    // Kiểm tra và tạo database nếu chưa có
     if (dbContext.Database.CanConnect())
     {
         try
@@ -162,4 +158,3 @@ using (var scope = app.Services.CreateScope())
 // ==================== RUN THE APP ====================
 
 app.Run();
-

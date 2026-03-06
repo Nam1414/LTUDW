@@ -8,9 +8,14 @@ namespace FashionEcommerce.Services.Interfaces
     public interface IProductService
     {
         /// <summary>
-        /// Lấy danh sách products với filter và pagination
+        /// Lấy danh sách products với filter và pagination (Customer - chỉ lấy IsActive = true)
         /// </summary>
-        Task<PagedResult<ProductDto>> GetAllAsync(ProductQueryParameters queryParameters);
+        Task<PagedResult<ProductDto>> GetAllAsync(ProductQueryParameters queryParameters, CancellationToken cancellationToken = default);
+
+        /// <summary>
+        /// Lấy danh sách products bao gồm cả inactive (Admin)
+        /// </summary>
+        Task<PagedResult<ProductDto>> GetAllForAdminAsync(ProductQueryParameters queryParameters, CancellationToken cancellationToken = default);
 
         /// <summary>
         /// Lấy product theo Id
@@ -33,4 +38,3 @@ namespace FashionEcommerce.Services.Interfaces
         Task<bool> DeleteAsync(int id);
     }
 }
-

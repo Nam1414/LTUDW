@@ -36,6 +36,10 @@ namespace FashionEcommerce.Data
                 
                 // Mặc định IsLocked là false
                 entity.Property(u => u.IsLocked).HasDefaultValue(false);
+
+                // Mặc định CreatedAt là GETDATE() trong SQL Server
+                entity.Property(u => u.CreatedAt)
+                    .HasDefaultValueSql("GETDATE()");
             });
 
             // Cấu hình Category Entity

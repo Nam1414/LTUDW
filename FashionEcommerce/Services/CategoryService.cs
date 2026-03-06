@@ -19,9 +19,28 @@ namespace FashionEcommerce.Services
         }
 
         /// <summary>
-        /// Lấy danh sách tất cả categories
+        /// Lấy danh sách tất cả categories (Customer - chỉ lấy IsActive = true)
         /// </summary>
         public async Task<IEnumerable<CategoryDto>> GetAllAsync()
+        {
+            return await _context.Categories
+                .AsNoTracking()
+                .Where(c => c.IsActive)
+                .Select(c => new CategoryDto
+                {
+                    Id = c.Id,
+                    Name = c.Name,
+                    Slug = c.Slug,
+                    ParentId = c.ParentId,
+                    IsActive = c.IsActive
+                })
+                .ToListAsync();
+        }
+
+        /// <summary>
+        /// Lấy danh sách tất cả categories bao gồm cả inactive (Admin)
+        /// </summary>
+        public async Task<IEnumerable<CategoryDto>> GetAllForAdminAsync()
         {
             return await _context.Categories
                 .AsNoTracking()
@@ -37,9 +56,32 @@ namespace FashionEcommerce.Services
         }
 
         /// <summary>
-        /// Lấy danh sách categories theo cấu trúc cây
+        /// Lấy danh sách categories theo cấu trúc cây (Customer - chỉ lấy IsActive = true)
         /// </summary>
         public async Task<IEnumerable<CategoryTreeDto>> GetTreeAsync()
+        {
+            var allCategories = await _context.Categories
+                .AsNoTracking()
+                .Where(c => c.IsActive)
+                .ToListAsync();
+
+            // Lấy danh sách root categories (ParentId = null)
+            var rootCategories = allCategories
+                .Where(c => c.ParentId == null)
+                .ToList();
+
+            // Build tree bằng đệ quy
+            var tree = rootCategories
+                .Select(c => BuildCategoryTree(c, allCategories))
+                .ToList();
+
+            return tree;
+        }
+
+        /// <summary>
+        /// Lấy danh sách categories theo cấu trúc cây bao gồm cả inactive (Admin)
+        /// </summary>
+        public async Task<IEnumerable<CategoryTreeDto>> GetTreeForAdminAsync()
         {
             var allCategories = await _context.Categories
                 .AsNoTracking()

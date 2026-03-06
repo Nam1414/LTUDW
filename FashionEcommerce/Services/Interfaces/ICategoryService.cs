@@ -8,14 +8,24 @@ namespace FashionEcommerce.Services.Interfaces
     public interface ICategoryService
     {
         /// <summary>
-        /// Lấy danh sách tất cả categories
+        /// Lấy danh sách tất cả categories (Customer - chỉ lấy IsActive = true)
         /// </summary>
         Task<IEnumerable<CategoryDto>> GetAllAsync();
 
         /// <summary>
-        /// Lấy danh sách categories theo cấu trúc cây
+        /// Lấy danh sách tất cả categories bao gồm cả inactive (Admin)
+        /// </summary>
+        Task<IEnumerable<CategoryDto>> GetAllForAdminAsync();
+
+        /// <summary>
+        /// Lấy danh sách categories theo cấu trúc cây (Customer - chỉ lấy IsActive = true)
         /// </summary>
         Task<IEnumerable<CategoryTreeDto>> GetTreeAsync();
+
+        /// <summary>
+        /// Lấy danh sách categories theo cấu trúc cây bao gồm cả inactive (Admin)
+        /// </summary>
+        Task<IEnumerable<CategoryTreeDto>> GetTreeForAdminAsync();
 
         /// <summary>
         /// Lấy category theo Id
