@@ -1,448 +1,159 @@
-# Fashion Ecommerce API
+# FashionEcommerce - .NET 9 & EF Core 9 Migration
 
-## 📋 Tổng quan
+## ✅ Migration Hoàn Tất
 
-Đây là dự án Fashion Ecommerce API được xây dựng bằng **ASP.NET Core 8 Web API** với các tính năng:
+### Thay đổi chính:
 
-### Module Users
-- Đăng ký / Đăng nhập người dùng
-- Quản lý profile cá nhân
-- Phân quyền Admin/Customer
-- Khóa/Mở khóa tài khoản
+#### 1. Framework & Packages
+| Package | Version cũ | Version mới |
+|---------|------------|-------------|
+| TargetFramework | net8.0 | **net9.0** |
+| Microsoft.EntityFrameworkCore.SqlServer | 8.0.0 | **9.0.0** |
+| Microsoft.AspNetCore.Authentication.JwtBearer | 8.0.0 | **9.0.0** |
+| Microsoft.AspNetCore.OpenApi | - | **9.0.0** |
+| Swashbuckle.AspNetCore | 6.5.0 | **7.2.0** |
 
-### Module Categories
-- Quản lý danh mục sản phẩm (CRUD)
-- Cấu trúc cây phân cấp (Tree structure)
-- Self-referencing relationship (Parent/Children)
+#### 2. Program.cs
+- Sử dụng `builder.Services.AddOpenApi()` thay vì cấu phức tạp
+- `app.MapOpenApi()` endpoint
+- Swagger UI vẫn giữ nguyên với JWT Authorization
 
-### Module Products
-- Quản lý sản phẩm (CRUD)
-- Tìm kiếm và lọc sản phẩm
-- Phân trang (Pagination)
-- Liên kết với Categories
-
-## 🛠️ Công nghệ sử dụng
-
-| Thành phần | Công nghệ |
-|------------|-----------|
-| Framework | ASP.NET Core 8 |
-| Database | SQL Server |
-| ORM | Entity Framework Core 8 |
-| Authentication | JWT (JSON Web Token) |
-| Password Hashing | BCrypt |
-| API Documentation | Swagger |
-
-## 📦 NuGet Packages đã cài đặt
-
-```xml
-<PackageReference Include="Microsoft.EntityFrameworkCore" Version="8.0.0" />
-<PackageReference Include="Microsoft.EntityFrameworkCore.SqlServer" Version="8.0.0" />
-<PackageReference Include="Microsoft.EntityFrameworkCore.Tools" Version="8.0.0" />
-<PackageReference Include="Microsoft.AspNetCore.Authentication.JwtBearer" Version="8.0.0" />
-<PackageReference Include="BCrypt.Net-Next" Version="4.0.3" />
-<PackageReference Include="Swashbuckle.AspNetCore" Version="6.5.0" />
-```
-
-## 📁 Cấu trúc dự án
-
-```
-FashionEcommerce/
-├── Controllers/
-│   └── UsersController.cs      # API Endpoints
-├── Services/
-│   ├── Interfaces/
-│   │   └── IUserService.cs     # Service Interface
-│   └── UserService.cs           # Business Logic
-├── Repositories/
-│   ├── Interfaces/
-│   │   └── IUserRepository.cs   # Repository Interface
-│   └── UserRepository.cs        # Data Access
-├── Models/
-│   ├── Entities/
-│   │   └── User.cs              # User Entity
-│   └── DTOs/
-│       ├── RegisterDTO.cs        # Đăng ký
-│       ├── LoginDTO.cs           # Đăng nhập
-│       ├── UserDTO.cs            # Thông tin user
-│       ├── UpdateProfileDTO.cs   # Cập nhật profile
-│       └── LoginResponseDTO.cs   # Response đăng nhập
-├── Data/
-│   └── AppDbContext.cs           # EF Core DbContext
-├── Helpers/
-│   └── JwtHelper.cs              # JWT Token Helper
-├── appsettings.json              # Cấu hình
-├── Program.cs                    # Entry Point
-└── FashionEcommerce.csproj       # Project File
-```
-
-## 🔌 API Endpoints
-
-| Method | Endpoint | Mô tả | Auth |
-|--------|----------|-------|------|
-| POST | `/api/users/register` | Đăng ký tài khoản | None |
-| POST | `/api/users/login` | Đăng nhập | None |
-| GET | `/api/users/profile` | Xem thông tin cá nhân | JWT |
-| PUT | `/api/users/profile` | Cập nhật thông tin | JWT |
-| PUT | `/api/users/{id}/lock` | Khóa tài khoản | JWT (Admin) |
-| PUT | `/api/users/{id}/unlock` | Mở khóa tài khoản | JWT (Admin) |
-
-## ⚙️ Cấu hình
-
-### appsettings.json
-
-```json
-{
-  "ConnectionStrings": {
-    "DefaultConnection": "Server=localhost;Database=FashionEcommerceDB;Trusted_Connection=True;TrustServerCertificate=True;"
-  },
-  "Jwt": {
-    "SecretKey": "YourSuperSecretKeyForJwtTokenGeneration2024!",
-    "Issuer": "FashionEcommerceAPI",
-    "Audience": "FashionEcommerceClient",
-    "ExpirationMinutes": 60
-  }
-}
-```
-
-## 🚀 Cách chạy dự án
-
-### 1. Cài đặt dependencies
-```bash
-dotnet restore
-```
-
-### 2. Cấu hình database
-Đảm bảo SQL Server đang chạy và cập nhật connection string trong `appsettings.json`
-
-### 3. Chạy ứng dụng (đã sử dụng EnsureCreated)
-```bash
-dotnet run
-```
-
-### 4. Truy cập Swagger UI
-```
-http://localhost:5000/swagger
-```
-
-## 🔐 Ví dụ sử dụng API
-
-### 1. Đăng ký (Register)
-```http
-POST /api/users/register
-Content-Type: application/json
-
-{
-  "email": "user@example.com",
-  "username": "username",
-  "password": "password123",
-  "confirmPassword": "password123",
-  "fullName": "Nguyen Van A",
-  "phoneNumber": "0123456789"
-}
-```
-
-### 2. Đăng nhập (Login)
-```http
-POST /api/users/login
-Content-Type: application/json
-
-{
-  "email": "user@example.com",
-  "password": "password123"
-}
-```
-
-**Response:**
-```json
-{
-  "token": "eyJhbGciOiJIUzI1NiIs...",
-  "expiresIn": 60,
-  "user": {
-    "id": 1,
-    "email": "user@example.com",
-    "role": "Customer",
-    ...
-  }
-}
-```
-
-### 3. Sử dụng Token
-Thêm header vào request:
-```
-Authorization: Bearer <token>
-```
-
-### 4. Khóa tài khoản (Admin only)
-```http
-PUT /api/users/2/lock
-Authorization: Bearer <admin_token>
-```
-
-## 🔑 Lưu ý bảo mật
-
-1. **Secret Key**: Thay đổi `Jwt:SecretKey` trong appsettings.json bằng một chuỗi ngẫu nhiên an toàn
-2. **HTTPS**: Trong môi trường production, hãy bật HTTPS
-3. **Password**: Mật khẩu được hash bằng BCrypt với cost factor mặc định
-4. **CORS**: Cấu hình CORS phù hợp trước khi deploy
-
-## 📝 Database Schema
-
-Bảng Users trong database:
-| Column | Type | Description |
-|--------|------|-------------|
-| Id | int | Primary Key |
-| Username | nvarchar(100) | Tên đăng nhập |
-| PasswordHash | nvarchar(255) | Mật khẩu đã hash |
-| Email | nvarchar(255) | Email (unique) |
-| GoogleId | nvarchar(255) | Google ID (nullable) |
-| DateOfBirth | datetime | Ngày sinh (nullable) |
-| FullName | nvarchar(100) | Họ tên (nullable) |
-| PhoneNumber | nvarchar(20) | Số điện thoại (nullable) |
-| AvatarUrl | nvarchar(500) | URL ảnh đại diện (nullable) |
-| Role | nvarchar(50) | Vai trò (Admin/Customer) |
-| IsLocked | bit | Trạng thái khóa |
-| CreatedAt | datetime | Ngày tạo |
-
-## ✅ Checklist sau khi tạo dự án
-
-- [x] Tạo dự án ASP.NET Core 8 Web API
-- [x] Cài đặt NuGet Packages
-- [x] Cấu hình Entity Framework Core
-- [x] Tạo User Entity phù hợp với database
-- [x] Tạo các DTOs
-- [x] Tạo Repository và Service
-- [x] Tạo UsersController với các endpoints
-- [x] Cấu hình JWT Authentication
-- [x] Cấu hình Swagger cho Production
-- [x] Test các API endpoints
-
-## 🎯 Trạng thái
-
-Dự án đã hoàn thành và test thành công:
-- ✅ Register API
-- ✅ Login API (trả về JWT token)
-- ✅ Get Profile API (với JWT)
-- ✅ Update Profile API (với JWT)
-- ✅ Lock/Unlock API (Admin only)
-- ✅ Swagger UI hoạt động trên Production
-- ✅ Categories API (CRUD + Tree)
-- ✅ Products API (CRUD + Filter + Pagination)
+#### 3. EF Core 9 Optimizations
+- Thêm `CancellationToken` support cho async operations
+- Tối ưu hóa `ProductService.GetAllAsync()` với:
+  - `CountAsync(cancellationToken)`
+  - `ToListAsync(cancellationToken)`
 
 ---
 
-# 📚 Catalog API Documentation (Categories & Products)
+## CLI Commands
 
-## 🔌 Categories API Endpoints
+```bash
+# Di chuyển đến thư mục project
+cd c:/t1/LTUDW/FashionEcommerce
 
-| Method | Endpoint | Mô tả | Auth |
-|--------|----------|-------|------|
-| GET | `/api/categories` | Lấy danh sách tất cả danh mục | None |
-| GET | `/api/categories/tree` | Lấy danh sách danh mục theo cấu trúc cây | None |
-| GET | `/api/categories/{id}` | Lấy chi tiết danh mục theo ID | None |
-| POST | `/api/categories` | Tạo mới danh mục | JWT |
-| PUT | `/api/categories/{id}` | Cập nhật danh mục | JWT |
-| DELETE | `/api/categories/{id}` | Xóa danh mục | JWT |
+# Clean project
+dotnet clean
 
-## 🔌 Products API Endpoints
+# Restore packages
+dotnet restore
 
-| Method | Endpoint | Mô tả | Auth |
-|--------|----------|-------|------|
-| GET | `/api/products` | Lấy danh sách sản phẩm (filter + pagination) | None |
-| GET | `/api/products/{id}` | Lấy chi tiết sản phẩm (bao gồm tên danh mục) | None |
-| POST | `/api/products` | Tạo mới sản phẩm | JWT |
-| PUT | `/api/products/{id}` | Cập nhật sản phẩm | JWT |
-| DELETE | `/api/products/{id}` | Xóa sản phẩm | JWT |
+# Build project
+dotnet build
 
-## 📝 Database Schema (Categories & Products)
-
-### Bảng Categories
-| Column | Type | Description |
-|--------|------|-------------|
-| Id | int | Primary Key (Auto-increment) |
-| Name | nvarchar(100) | Tên danh mục |
-| Slug | varchar(100) | Slug (unique) |
-| ParentId | int | ID danh mục cha (nullable, FK self-reference) |
-| IsActive | bit | Trạng thái hoạt động (default: 1) |
-
-### Bảng Products
-| Column | Type | Description |
-|--------|------|-------------|
-| Id | int | Primary Key (Auto-increment) |
-| Name | nvarchar(200) | Tên sản phẩm |
-| Slug | varchar(200) | Slug (unique) |
-| Description | nvarchar(max) | Mô tả sản phẩm (nullable) |
-| Price | decimal(18,2) | Giá sản phẩm |
-| CategoryId | int | FK đến bảng Categories |
-| Thumbnail | varchar(500) | URL ảnh đại diện (nullable) |
-| IsActive | bit | Trạng thái hoạt động (default: 1) |
-
-## 🔍 Ví dụ sử dụng API Categories
-
-### 1. Lấy danh sách tất cả danh mục
-```http
-GET /api/categories
+# Run project
+dotnet run
 ```
 
-**Response:**
+---
+
+## Test API với Postman
+
+### Bước 1: Chạy API
+```bash
+dotnet run
+```
+API sẽ chạy tại: `http://localhost:5000` (hoặc cổng khác tùy cấu hình)
+
+### Bước 2: Đăng ký User (Lấy Token)
+
+**POST** `http://localhost:5xxx/api/users/register`
+
 ```json
-[
-  {
+{
+  "email": "admin@test.com",
+  "password": "Admin123!",
+  "fullName": "Admin User",
+  "phone": "0123456789"
+}
+```
+
+### Bước 3: Đăng nhập (Lấy JWT Token)
+
+**POST** `http://localhost:5xxx/api/users/login`
+
+```json
+{
+  "email": "admin@test.com",
+  "password": "Admin123!"
+}
+```
+
+**Response sẽ trả về:**
+```json
+{
+  "token": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...",
+  "user": {
     "id": 1,
-    "name": "Áo nam",
-    "slug": "ao-nam",
-    "parentId": null,
-    "isActive": true
-  },
-  {
-    "id": 2,
-    "name": "Áo thun",
-    "slug": "ao-thun",
-    "parentId": 1,
-    "isActive": true
+    "email": "admin@test.com",
+    "fullName": "Admin User"
   }
-]
-```
-
-### 2. Lấy danh mục theo cấu trúc cây
-```http
-GET /api/categories/tree
-```
-
-**Response:**
-```json
-[
-  {
-    "id": 1,
-    "name": "Áo nam",
-    "slug": "ao-nam",
-    "parentId": null,
-    "isActive": true,
-    "children": [
-      {
-        "id": 2,
-        "name": "Áo thun",
-        "slug": "ao-thun",
-        "parentId": 1,
-        "isActive": true,
-        "children": []
-      }
-    ]
-  }
-]
-```
-
-### 3. Tạo mới danh mục
-```http
-POST /api/categories
-Authorization: Bearer <token>
-Content-Type: application/json
-
-{
-  "name": "Áo sơ mi",
-  "slug": "ao-so-mi",
-  "parentId": 1,
-  "isActive": true
 }
 ```
 
-## 🔍 Ví dụ sử dụng API Products
+### Bước 4: Cấu hình Postman
 
-### 1. Lấy danh sách sản phẩm với filter và pagination
-```http
-GET /api/products?SearchTerm=áo&CategoryId=1&MinPrice=100000&MaxPrice=500000&PageIndex=1&PageSize=10
+1. Copy token từ response đăng nhập
+2. Trong Postman, vào tab **Headers**
+3. Thêm header:
+   - **Key**: `Authorization`
+   - **Value**: `Bearer YOUR_TOKEN_HERE`
+
+---
+
+## Danh sách API Endpoints
+
+### 🔓 Public Endpoints (Không cần token)
+
+| Method | Endpoint | Mô tả |
+|--------|----------|-------|
+| POST | `/api/users/register` | Đăng ký user mới |
+| POST | `/api/users/login` | Đăng nhập, lấy JWT token |
+
+### 🔐 Protected Endpoints (Cần token)
+
+#### Categories
+| Method | Endpoint | Mô tả |
+|--------|----------|-------|
+| GET | `/api/categories` | Lấy tất cả categories |
+| GET | `/api/categories/tree` | Lấy categories theo cấu trúc cây |
+| GET | `/api/categories/{id}` | Lấy category by ID |
+| POST | `/api/categories` | Tạo category mới |
+| PUT | `/api/categories/{id}` | Cập nhật category |
+| DELETE | `/api/categories/{id}` | Xóa category |
+
+#### Products
+| Method | Endpoint | Mô tả |
+|--------|----------|-------|
+| GET | `/api/products` | Lấy danh sách products (filter + paging) |
+| GET | `/api/products/{id}` | Lấy product by ID |
+| POST | `/api/products` | Tạo product mới |
+| PUT | `/api/products/{id}` | Cập nhật product |
+| DELETE | `/api/products/{id}` | Xóa product |
+
+---
+
+## Query Parameters cho Products
+
+| Parameter | Type | Mô tả | Ví dụ |
+|-----------|------|-------|-------|
+| `SearchTerm` | string | Tìm theo tên | `?SearchTerm=áo` |
+| `CategoryId` | int | Lọc theo category | `?CategoryId=1` |
+| `MinPrice` | decimal | Giá tối thiểu | `?MinPrice=100000` |
+| `MaxPrice` | decimal | Giá tối đa | `?MaxPrice=500000` |
+| `PageIndex` | int | Trang hiện tại (mặc định: 1) | `?PageIndex=1` |
+| `PageSize` | int | Số item/trang (mặc định: 10) | `?PageSize=10` |
+
+**Ví dụ đầy đủ:**
+```
+GET http://localhost:5xxx/api/products?SearchTerm=áo&CategoryId=1&MinPrice=100000&MaxPrice=500000&PageIndex=1&PageSize=10
 ```
 
-**Query Parameters:**
-| Parameter | Type | Description | Default |
-|-----------|------|-------------|---------|
-| SearchTerm | string | Tìm kiếm theo tên | null |
-| CategoryId | int? | Lọc theo danh mục | null |
-| MinPrice | decimal? | Giá tối thiểu | null |
-| MaxPrice | decimal? | Giá tối đa | null |
-| PageIndex | int | Chỉ mục trang | 1 |
-| PageSize | int | Kích thước trang | 10 |
+---
 
-**Response:**
-```json
-{
-  "totalItems": 25,
-  "totalPages": 3,
-  "pageIndex": 1,
-  "pageSize": 10,
-  "hasPreviousPage": false,
-  "hasNextPage": true,
-  "items": [
-    {
-      "id": 1,
-      "name": "Áo thun nam",
-      "slug": "ao-thun-nam",
-      "description": "Áo thun cotton",
-      "price": 199000,
-      "categoryId": 1,
-      "categoryName": "Áo nam",
-      "thumbnail": "https://example.com/image.jpg",
-      "isActive": true
-    }
-  ]
-}
-```
-
-### 2. Lấy chi tiết sản phẩm
-```http
-GET /api/products/1
-```
-
-**Response:**
-```json
-{
-  "id": 1,
-  "name": "Áo thun nam",
-  "slug": "ao-thun-nam",
-  "description": "Áo thun cotton chất lượng cao",
-  "price": 199000,
-  "categoryId": 1,
-  "categoryName": "Áo nam",
-  "thumbnail": "https://example.com/image.jpg",
-  "isActive": true
-}
-```
-
-### 3. Tạo mới sản phẩm
-```http
-POST /api/products
-Authorization: Bearer <token>
-Content-Type: application/json
-
-{
-  "name": "Áo thun nam",
-  "slug": "ao-thun-nam",
-  "description": "Áo thun cotton chất lượng cao",
-  "price": 199000,
-  "categoryId": 1,
-  "thumbnail": "https://example.com/image.jpg",
-  "isActive": true
-}
-```
-
-## ⚡ Tối ưu hiệu năng
-
-1. **AsNoTracking()**: Được sử dụng cho tất cả các operation GET để tối ưu bộ nhớ
-2. **IQueryable**: Sử dụng cho filter và pagination để tránh tải toàn bộ dữ liệu lên memory
-3. **Include()**: Sử dụng .Include(p => p.Category) để load thông tin category trong cùng query
-4. **Index**: Các trường Slug được đánh unique index để tăng tốc độ tìm kiếm
-
-## ✅ Checklist Catalog API
-
-- [x] Tạo Category Entity với self-referencing relationship
-- [x] Tạo Product Entity với relationship với Category
-- [x] Cấu hình Fluent API trong AppDbContext
-- [x] Tạo DTOs cho Category và Product
-- [x] Tạo PagedResult<T> cho pagination
-- [x] Tạo ProductQueryParameters cho filter
-- [x] Tạo CategoryService với recursive tree building
-- [x] Tạo ProductService với IQueryable filter/pagination
-- [x] Tạo CategoriesController
-- [x] Tạo ProductsController
-- [x] Đăng ký services trong Program.cs
-- [x] Build thành công với 0 errors
-
+## Công nghệ sử dụng
+- ASP.NET Core 9.0
+- Entity Framework Core 9.0
+- SQL Server
+- JWT Authentication
+- Swagger/OpenAPI
