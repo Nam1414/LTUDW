@@ -1,5 +1,5 @@
+using LTUDW.Data;
 using Microsoft.EntityFrameworkCore;
-using LTUDW.Entity;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -8,7 +8,7 @@ builder.Services.AddControllers();
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 
-// DB Connection
+// Database
 builder.Services.AddDbContext<AppDbContext>(options =>
     options.UseSqlServer(
         builder.Configuration.GetConnectionString("FashionEcommerceDB")
@@ -17,14 +17,6 @@ builder.Services.AddDbContext<AppDbContext>(options =>
 
 var app = builder.Build();
 
-// Auto migrate database when run
-using (var scope = app.Services.CreateScope())
-{
-    var db = scope.ServiceProvider.GetRequiredService<AppDbContext>();
-    db.Database.Migrate();
-}
-
-// Configure
 if (app.Environment.IsDevelopment())
 {
     app.UseSwagger();
@@ -32,7 +24,11 @@ if (app.Environment.IsDevelopment())
 }
 
 app.UseHttpsRedirection();
+
+app.UseStaticFiles();
+
 app.UseAuthorization();
+
 app.MapControllers();
 
 app.Run();

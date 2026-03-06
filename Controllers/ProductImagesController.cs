@@ -1,11 +1,11 @@
-using LTUDW.Entity;
+using LTUDW.Data;
 using LTUDW.Models;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 
 namespace LTUDW.Controllers;
 
-[Route("api")]
+[Route("api/products")]
 [ApiController]
 public class ProductImagesController : ControllerBase
 {
@@ -18,10 +18,8 @@ public class ProductImagesController : ControllerBase
         _env = env;
     }
 
-    // ==============================
     // GET images of product
-    // ==============================
-    [HttpGet("products/{productId}/images")]
+    [HttpGet("{productId}/images")]
     public async Task<IActionResult> GetImages(int productId)
     {
         var images = await _context.ProductImages
@@ -32,24 +30,23 @@ public class ProductImagesController : ControllerBase
         return Ok(images);
     }
 
-    // ==============================
     // UPLOAD image
-    // ==============================
-    [HttpPost("products/{productId}/images/upload")]
+    [HttpPost("{productId}/images/upload")]
     public async Task<IActionResult> UploadImage(int productId, IFormFile file)
     {
         if (file == null || file.Length == 0)
-            return BadRequest("File is empty");
+            return BadRequest("File not found");
 
         var uploadFolder = Path.Combine(_env.WebRootPath ?? "wwwroot", "uploads");
 
         if (!Directory.Exists(uploadFolder))
             Directory.CreateDirectory(uploadFolder);
 
-        var fileName = Guid.NewGuid().ToString() + Path.GetExtension(file.FileName);
-        var filePath = Path.Combine(uploadFolder, fileName);
+        var fileName = Guid.NewGuid() + Path.GetExtension(file.FileName);
 
-        using (var stream = new FileStream(filePath, FileMode.Create))
+        var path = Path.Combine(uploadFolder, fileName);
+
+        using (var stream = new FileStream(path, FileMode.Create))
         {
             await file.CopyToAsync(stream);
         }
@@ -67,9 +64,7 @@ public class ProductImagesController : ControllerBase
         return Ok(image);
     }
 
-    // ==============================
     // DELETE image
-    // ==============================
     [HttpDelete("images/{id}")]
     public async Task<IActionResult> DeleteImage(int id)
     {
@@ -84,9 +79,7 @@ public class ProductImagesController : ControllerBase
         return Ok();
     }
 
-    // ==============================
     // SORT images
-    // ==============================
     [HttpPut("images/sort")]
     public async Task<IActionResult> SortImages([FromBody] List<ProductImage> images)
     {
