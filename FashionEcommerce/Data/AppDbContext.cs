@@ -1,79 +1,66 @@
 using Microsoft.EntityFrameworkCore;
 using FashionEcommerce.Models.Entities;
 
-namespace FashionEcommerce.Data
+namespace FashionEcommerce.Data;
+
+public class AppDbContext : DbContext
 {
-    /// <summary>
-    /// DbContext - Đại diện cho phiên làm việc với database
-    /// </summary>
-    public class AppDbContext : DbContext
+    public AppDbContext(DbContextOptions<AppDbContext> options) : base(options) { }
+
+
+    // CATEGORIES
+    public DbSet<Category> Categories { get; set; }
+
+    // USERS
+    public DbSet<User> Users { get; set; }
+
+    // PRODUCTS
+    public DbSet<Product> Products { get; set; }
+    public DbSet<ProductVariant> ProductVariants { get; set; }
+    public DbSet<ProductImage> ProductImages { get; set; }
+
+    // MASTER DATA
+    public DbSet<MasterColor> MasterColors { get; set; }
+    public DbSet<MasterSize> MasterSizes { get; set; }
+
+    // PROMOTIONS
+    public DbSet<Promotion> Promotions { get; set; }
+    public DbSet<PromotionCondition> PromotionConditions { get; set; }
+    public DbSet<ProductPromotion> ProductPromotions { get; set; }
+
+    // COUPONS
+    public DbSet<Coupon> Coupons { get; set; }
+
+    protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
-        // Constructor nhận DbContextOptions để cấu hình từ Program.cs
-        public AppDbContext(DbContextOptions<AppDbContext> options) : base(options)
-        {
-        }
+        base.OnModelCreating(modelBuilder);
 
-        // DbSet cho các Entity
-        public DbSet<User> Users { get; set; }
-        public DbSet<Category> Categories { get; set; }
-        public DbSet<Product> Products { get; set; }
+        // Unique SKU
+        modelBuilder.Entity<ProductVariant>()
+            .HasIndex(p => p.Sku)
+            .IsUnique();
 
-        /// <summary>
-        /// Cấu hình model khi Fluent API được sử dụng
-        /// </summary>
-        protected override void OnModelCreating(ModelBuilder modelBuilder)
-        {
-            base.OnModelCreating(modelBuilder);
+        // Unique Coupon Code
+        modelBuilder.Entity<Coupon>()
+            .HasIndex(c => c.Code)
+            .IsUnique();
 
-            // Cấu hình User Entity
-            modelBuilder.Entity<User>(entity =>
-            {
-                // Email là duy nhất
-                entity.HasIndex(u => u.Email).IsUnique();
+        // Unique Product Slug
+        modelBuilder.Entity<Product>()
+            .HasIndex(p => p.Slug)
+            .IsUnique();
 
-                // Mặc định role là Customer
-                entity.Property(u => u.Role).HasDefaultValue("Customer");
-                
-                // Mặc định IsLocked là false
-                entity.Property(u => u.IsLocked).HasDefaultValue(false);
+        // Price precision
+        modelBuilder.Entity<Product>()
+            .Property(p => p.Price)
+            .HasColumnType("decimal(18,2)");
 
-                // Mặc định CreatedAt là GETDATE() trong SQL Server
-                entity.Property(u => u.CreatedAt)
-                    .HasDefaultValueSql("GETDATE()");
-            });
+        modelBuilder.Entity<ProductVariant>()
+            .Property(p => p.PriceModifier)
+            .HasColumnType("decimal(18,2)");
 
-            // Cấu hình Category Entity
-            modelBuilder.Entity<Category>(entity =>
-            {
-                // Slug là duy nhất
-                entity.HasIndex(c => c.Slug).IsUnique();
-
-                // Cấu hình self-referencing relationship
-                entity.HasOne(c => c.Parent)
-                    .WithMany(c => c.Children)
-                    .HasForeignKey(c => c.ParentId)
-                    .OnDelete(DeleteBehavior.Restrict);
-
-                // Mặc định IsActive là true
-                entity.Property(c => c.IsActive).HasDefaultValue(true);
-            });
-
-            // Cấu hình Product Entity
-            modelBuilder.Entity<Product>(entity =>
-            {
-                // Slug là duy nhất
-                entity.HasIndex(p => p.Slug).IsUnique();
-
-                // Cấu hình relationship với Category
-                entity.HasOne(p => p.Category)
-                    .WithMany(c => c.Products)
-                    .HasForeignKey(p => p.CategoryId)
-                    .OnDelete(DeleteBehavior.Restrict);
-
-                // Mặc định IsActive là true
-                entity.Property(p => p.IsActive).HasDefaultValue(true);
-            });
-        }
+        modelBuilder.Entity<Promotion>()
+            .Property(p => p.DiscountValue)
+            .HasColumnType("decimal(18,2)");
     }
 }
-

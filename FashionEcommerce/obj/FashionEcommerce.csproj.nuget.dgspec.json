@@ -1,17 +1,17 @@
 {
   "format": 1,
   "restore": {
-    "C:\\t1\\LTUDW\\FashionEcommerce\\FashionEcommerce.csproj": {}
+    "C:\\GIt\\LTUDW\\FashionEcommerce\\FashionEcommerce.csproj": {}
   },
   "projects": {
-    "C:\\t1\\LTUDW\\FashionEcommerce\\FashionEcommerce.csproj": {
+    "C:\\GIt\\LTUDW\\FashionEcommerce\\FashionEcommerce.csproj": {
       "version": "1.0.0",
       "restore": {
-        "projectUniqueName": "C:\\t1\\LTUDW\\FashionEcommerce\\FashionEcommerce.csproj",
+        "projectUniqueName": "C:\\GIt\\LTUDW\\FashionEcommerce\\FashionEcommerce.csproj",
         "projectName": "FashionEcommerce",
-        "projectPath": "C:\\t1\\LTUDW\\FashionEcommerce\\FashionEcommerce.csproj",
+        "projectPath": "C:\\GIt\\LTUDW\\FashionEcommerce\\FashionEcommerce.csproj",
         "packagesPath": "C:\\Users\\Anh Kha\\.nuget\\packages\\",
-        "outputPath": "C:\\t1\\LTUDW\\FashionEcommerce\\obj\\",
+        "outputPath": "C:\\GIt\\LTUDW\\FashionEcommerce\\obj\\",
         "projectStyle": "PackageReference",
         "configFilePaths": [
           "C:\\Users\\Anh Kha\\AppData\\Roaming\\NuGet\\NuGet.Config"

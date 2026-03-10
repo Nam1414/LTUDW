@@ -1,7 +1,7 @@
 using Microsoft.EntityFrameworkCore;
 using FashionEcommerce.Data;
-using FashionEcommerce.Models.DTOs;
 using FashionEcommerce.Models.Entities;
+using FashionEcommerce.Models.DTOs;
 using FashionEcommerce.Services.Interfaces;
 
 namespace FashionEcommerce.Services
