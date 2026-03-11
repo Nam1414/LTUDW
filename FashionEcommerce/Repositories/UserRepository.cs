@@ -1,6 +1,6 @@
 using Microsoft.EntityFrameworkCore;
 using FashionEcommerce.Data;
-using FashionEcommerce.Models.Entities;
+using FashionEcommerce.Models;
 using FashionEcommerce.Repositories.Interfaces;
 
 namespace FashionEcommerce.Repositories

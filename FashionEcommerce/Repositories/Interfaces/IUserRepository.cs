@@ -1,4 +1,4 @@
-using FashionEcommerce.Models.Entities;
+using FashionEcommerce.Models;
 
 namespace FashionEcommerce.Repositories.Interfaces
 {

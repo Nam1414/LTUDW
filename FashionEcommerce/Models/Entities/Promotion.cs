@@ -1,3 +1,5 @@
+namespace FashionEcommerce.Models.Entities;
+
 public class Promotion
 {
     public int Id { get; set; }
@@ -17,4 +19,6 @@ public class Promotion
     public int Priority { get; set; }
 
     public List<ProductPromotion>? ProductPromotions { get; set; }
+
+    public List<PromotionCondition>? PromotionConditions { get; set; }
 }

@@ -1,98 +1,73 @@
-using FashionEcommerce.Data;
-using FashionEcommerce.Models.Entities;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using FashionEcommerce.Data;
+using FashionEcommerce.Models.Entities;
 
-namespace FashionEcommerce.Controllers;
-
-[Route("api/products")]
+[Authorize]
 [ApiController]
+[Route("api/products/[controller]")]  // ← QUAN TRỌNG: api/products/images
 public class ProductImagesController : ControllerBase
 {
     private readonly AppDbContext _context;
-    private readonly IWebHostEnvironment _env;
+    public ProductImagesController(AppDbContext context) => _context = context;
 
-    public ProductImagesController(AppDbContext context, IWebHostEnvironment env)
+    [HttpPost("{productId}")]
+    public async Task<IActionResult> AddImage(int productId, [FromBody] AddImageDto dto)
     {
-        _context = context;
-        _env = env;
-    }
-
-    // GET images of product
-    [HttpGet("{productId}/images")]
-    public async Task<IActionResult> GetImages(int productId)
-    {
-        var images = await _context.ProductImages
-            .Where(i => i.ProductId == productId)
-            .OrderBy(i => i.SortOrder)
-            .ToListAsync();
-
-        return Ok(images);
-    }
-
-    // UPLOAD image
-    [HttpPost("{productId}/images/upload")]
-    public async Task<IActionResult> UploadImage(int productId, IFormFile file)
-    {
-        if (file == null || file.Length == 0)
-            return BadRequest("File not found");
-
-        var uploadFolder = Path.Combine(_env.WebRootPath ?? "wwwroot", "uploads");
-
-        if (!Directory.Exists(uploadFolder))
-            Directory.CreateDirectory(uploadFolder);
-
-        var fileName = Guid.NewGuid() + Path.GetExtension(file.FileName);
-
-        var path = Path.Combine(uploadFolder, fileName);
-
-        using (var stream = new FileStream(path, FileMode.Create))
-        {
-            await file.CopyToAsync(stream);
-        }
+        var product = await _context.Products.FindAsync(productId);
+        if (product == null) return NotFound("Product not found");
 
         var image = new ProductImage
         {
             ProductId = productId,
-            ImageUrl = "/uploads/" + fileName,
-            SortOrder = 0
+            ImageUrl = dto.ImageUrl,
+            SortOrder = dto.SortOrder,
+            CreatedAt = DateTime.UtcNow
         };
-
         _context.ProductImages.Add(image);
         await _context.SaveChangesAsync();
 
-        return Ok(image);
+        // ✅ FIXED: No circular reference
+        return Ok(new 
+        {
+            id = image.Id,
+            productId = image.ProductId,
+            imageUrl = image.ImageUrl,
+            sortOrder = image.SortOrder,
+            createdAt = image.CreatedAt
+        });
     }
 
-    // DELETE image
-    [HttpDelete("images/{id}")]
-    public async Task<IActionResult> DeleteImage(int id)
-    {
-        var image = await _context.ProductImages.FindAsync(id);
 
-        if (image == null)
-            return NotFound();
+    [HttpPut("{productId}/{imageId}")]
+    public async Task<IActionResult> UpdateSortOrder(int productId, int imageId, [FromBody] int sortOrder)
+    {
+        var image = await _context.ProductImages
+            .FirstOrDefaultAsync(pi => pi.ProductId == productId && pi.Id == imageId);
+        if (image == null) return NotFound("Image not found");
+
+        image.SortOrder = sortOrder;
+        await _context.SaveChangesAsync();
+        return Ok(new { id = image.Id, productId = image.ProductId, imageUrl = image.ImageUrl, sortOrder = image.SortOrder });
+    }
+
+    [HttpDelete("{productId}/{imageId}")]
+    public async Task<IActionResult> DeleteImage(int productId, int imageId)
+    {
+        var image = await _context.ProductImages
+            .FirstOrDefaultAsync(pi => pi.ProductId == productId && pi.Id == imageId);
+        if (image == null) return NotFound("Image not found");
 
         _context.ProductImages.Remove(image);
         await _context.SaveChangesAsync();
-
-        return Ok();
+        return Ok("Image deleted");
     }
 
-    // SORT images
-    [HttpPut("images/sort")]
-    public async Task<IActionResult> SortImages([FromBody] List<ProductImage> images)
+
+    public class AddImageDto
     {
-        foreach (var item in images)
-        {
-            var image = await _context.ProductImages.FindAsync(item.Id);
-
-            if (image != null)
-                image.SortOrder = item.SortOrder;
-        }
-
-        await _context.SaveChangesAsync();
-
-        return Ok();
+        public string ImageUrl { get; set; } = string.Empty;
+        public int SortOrder { get; set; } = 0;
     }
 }

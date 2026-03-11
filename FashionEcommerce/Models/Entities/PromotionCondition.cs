@@ -1,3 +1,5 @@
+namespace FashionEcommerce.Models.Entities;
+
 public class PromotionCondition
 {
     public int Id { get; set; }

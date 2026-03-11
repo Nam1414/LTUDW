@@ -1,177 +1,100 @@
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using FashionEcommerce.Models.DTOs;
-using FashionEcommerce.Services.Interfaces;
-using System.Security.Claims;
+using Microsoft.EntityFrameworkCore;
+using FashionEcommerce.Data;
+using FashionEcommerce.Models;
+using BCrypt.Net;  // Password hash
 
-namespace FashionEcommerce.Controllers
+[Authorize]
+[ApiController]
+[Route("api/[controller]")]
+public class UsersController : ControllerBase
 {
-    /// <summary>
-    /// Controller xử lý các API liên quan đến User
-    /// </summary>
-    [ApiController]
-    [Route("api/[controller]")]
-    public class UsersController : ControllerBase
+    private readonly AppDbContext _context;
+    public UsersController(AppDbContext context) => _context = context;
+
+    [HttpGet("me")]
+    public IActionResult GetProfile()
     {
-        private readonly IUserService _userService;
+        var userId = User.FindFirst("id")?.Value;
+        return Ok(new { 
+            userId,
+            claims = User.Claims.Select(c => new { c.Type, c.Value }).ToList(),
+            isAuth = User.Identity?.IsAuthenticated ?? false
+        });
+    }
 
-        public UsersController(IUserService userService)
+    [HttpGet("claims")]
+    public IActionResult GetClaims()
+    {
+        var claims = User.Claims.Select(c => new { c.Type, c.Value }).ToList();
+        return Ok(claims);
+    }
+
+    [Authorize(Roles = "Admin")]
+    [HttpGet]  
+    public async Task<IActionResult> GetAll([FromQuery] int page = 1, int pageSize = 10)
+    {
+        var users = await _context.Users
+            .Skip((page - 1) * pageSize)
+            .Take(pageSize)
+            .Select(u => new { u.Id, u.Email, u.FullName, u.Role, u.IsLocked })
+            .ToListAsync();
+        return Ok(users);
+    }
+
+    [Authorize(Roles = "Admin")]
+    [HttpGet("{id}")]  
+    public async Task<IActionResult> GetUser(int id)
+    {
+        var user = await _context.Users
+            .Where(u => u.Id == id)
+            .Select(u => new { u.Id, u.Email, u.FullName, u.Role, u.IsLocked })
+            .FirstOrDefaultAsync();
+        return user == null ? NotFound() : Ok(user);
+    }
+
+    [Authorize(Roles = "Admin")]
+    [HttpPost]  
+    public async Task<IActionResult> CreateUser([FromBody] CreateUserDto dto)
+    {
+        if (await _context.Users.AnyAsync(u => u.Email == dto.Email))
+            return BadRequest("Email already exists");
+
+        var user = new User
         {
-            _userService = userService;
-        }
+            Email = dto.Email,
+            FullName = dto.FullName,
+            PasswordHash = BCrypt.Net.BCrypt.HashPassword(dto.Password),
+            Role = "Customer",
+            IsLocked = false,
+            CreatedAt = DateTime.UtcNow
+        };
+        _context.Users.Add(user);
+        await _context.SaveChangesAsync();
 
-        /// <summary>
-        /// POST /api/users/register - Đăng ký tài khoản mới
-        /// </summary>
-        [HttpPost("register")]
-        [AllowAnonymous] // Cho phép truy cập không cần auth
-        public async Task<IActionResult> Register([FromBody] RegisterDTO registerDTO)
-        {
-            // Validate model
-            if (!ModelState.IsValid)
-            {
-                return BadRequest(ModelState);
-            }
+        return CreatedAtAction(nameof(GetUser), new { id = user.Id }, 
+            new { id = user.Id, email = user.Email, fullName = user.FullName });
+    }
 
-            var result = await _userService.RegisterAsync(registerDTO);
+    [Authorize(Roles = "Admin")]
+    [HttpPut("{id}/lock")]
+    public async Task<IActionResult> LockUser(int id, [FromBody] bool isLocked)
+    {
+        var user = await _context.Users.FindAsync(id);
+        if (user == null) return NotFound();
+        if (user.Id == 1) return BadRequest("Cannot lock admin");
 
-            if (!result.Success)
-            {
-                return BadRequest(new { message = result.Message });
-            }
-
-            return Ok(new 
-            { 
-                message = result.Message, 
-                user = result.User 
-            });
-        }
-
-        /// <summary>
-        /// POST /api/users/login - Đăng nhập
-        /// </summary>
-        [HttpPost("login")]
-        [AllowAnonymous] // Cho phép truy cập không cần auth
-        public async Task<IActionResult> Login([FromBody] LoginDTO loginDTO)
-        {
-            // Validate model
-            if (!ModelState.IsValid)
-            {
-                return BadRequest(ModelState);
-            }
-
-            var result = await _userService.LoginAsync(loginDTO);
-
-            if (!result.Success)
-            {
-                return Unauthorized(new { message = result.Message });
-            }
-
-            return Ok(result.Response);
-        }
-
-        /// <summary>
-        /// GET /api/users/profile - Xem thông tin cá nhân
-        /// </summary>
-        [HttpGet("profile")]
-        [Authorize] // Yêu cầu JWT token
-        public async Task<IActionResult> GetProfile()
-        {
-            // Lấy UserId từ token
-            var userId = GetCurrentUserId();
-
-            var result = await _userService.GetProfileAsync(userId);
-
-            if (!result.Success)
-            {
-                return NotFound(new { message = result.Message });
-            }
-
-            return Ok(result.User);
-        }
-
-        /// <summary>
-        /// PUT /api/users/profile - Cập nhật thông tin cá nhân
-        /// </summary>
-        [HttpPut("profile")]
-        [Authorize] // Yêu cầu JWT token
-        public async Task<IActionResult> UpdateProfile([FromBody] UpdateProfileDTO updateDTO)
-        {
-            // Validate model
-            if (!ModelState.IsValid)
-            {
-                return BadRequest(ModelState);
-            }
-
-            // Lấy UserId từ token
-            var userId = GetCurrentUserId();
-
-            var result = await _userService.UpdateProfileAsync(userId, updateDTO);
-
-            if (!result.Success)
-            {
-                return BadRequest(new { message = result.Message });
-            }
-
-            return Ok(new 
-            { 
-                message = result.Message, 
-                user = result.User 
-            });
-        }
-
-        /// <summary>
-        /// PUT /api/users/{id}/lock - Khóa tài khoản (Admin only)
-        /// </summary>
-        [HttpPut("{id}/lock")]
-        [Authorize(Roles = "Admin")] // Chỉ Admin mới có thể khóa tài khoản
-        public async Task<IActionResult> LockUser(int id)
-        {
-            // Lấy ID của admin đang thực hiện thao tác
-            var adminId = GetCurrentUserId();
-
-            var result = await _userService.LockUserAsync(id, adminId);
-
-            if (!result.Success)
-            {
-                return BadRequest(new { message = result.Message });
-            }
-
-            return Ok(new { message = result.Message });
-        }
-
-        /// <summary>
-        /// PUT /api/users/{id}/unlock - Mở khóa tài khoản (Admin only)
-        /// </summary>
-        [HttpPut("{id}/unlock")]
-        [Authorize(Roles = "Admin")] // Chỉ Admin mới có thể mở khóa tài khoản
-        public async Task<IActionResult> UnlockUser(int id)
-        {
-            // Lấy ID của admin đang thực hiện thao tác
-            var adminId = GetCurrentUserId();
-
-            var result = await _userService.UnlockUserAsync(id, adminId);
-
-            if (!result.Success)
-            {
-                return BadRequest(new { message = result.Message });
-            }
-
-            return Ok(new { message = result.Message });
-        }
-
-        /// <summary>
-        /// Helper method để lấy UserId từ JWT token
-        /// </summary>
-        private int GetCurrentUserId()
-        {
-            var userIdClaim = User.FindFirst(ClaimTypes.NameIdentifier);
-            if (userIdClaim == null)
-            {
-                throw new UnauthorizedAccessException("User ID not found in token");
-            }
-            return int.Parse(userIdClaim.Value);
-        }
+        user.IsLocked = isLocked;
+        await _context.SaveChangesAsync();
+        return Ok(new { Message = $"User {user.Email} {(isLocked ? "locked" : "unlocked")}" });
     }
 }
 
+// DTO
+public class CreateUserDto
+{
+    public string Email { get; set; } = string.Empty;
+    public string FullName { get; set; } = string.Empty;
+    public string Password { get; set; } = string.Empty;
+}

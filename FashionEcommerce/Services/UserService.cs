@@ -1,7 +1,7 @@
 using BCrypt.Net;
 using FashionEcommerce.Helpers;
 using FashionEcommerce.Models.DTOs;
-using FashionEcommerce.Models.Entities;
+using FashionEcommerce.Models;
 using FashionEcommerce.Repositories.Interfaces;
 using FashionEcommerce.Services.Interfaces;
 
